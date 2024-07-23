@@ -1,25 +1,39 @@
-const sliderWrapper = document.querySelector(".sliderWrapper");
-const sliderItems = Array.from(document.querySelectorAll(".sliderItem"));
-const itemCount = sliderItems.length;
-// Đặt kích thước của sliderWrapper để chứa tất cả các phần tử
-sliderWrapper.style.width = `${itemCount * 100}%`;
-function rotateSlides() {
-  // Chuyển phần tử đầu tiên ra khỏi danh sách
-  const firstItem = sliderItems.shift();
-  sliderItems.push(firstItem);
-  // Cập nhật DOM để phản ánh sự thay đổi
-  sliderWrapper.innerHTML = ""; 
-  sliderItems.forEach((item) => sliderWrapper.appendChild(item)); 
-  // Tính toán dịch chuyển cần thiết
-  const offset = -100; // Dịch chuyển một slide về phía bên trái
-  sliderWrapper.style.transform = `translateX(${offset}%)`;
-  setTimeout(() => {
-    sliderWrapper.style.transition = "none"; // Tắt hiệu ứng chuyển động
-    sliderWrapper.style.transform = `translateX(0%)`; // Quay lại vị trí ban đầu
-    // Cập nhật DOM để phản ánh sự thay đổi
-    sliderWrapper.appendChild(firstItem); // Đặt phần tử đầu tiên về cuối
-    setTimeout(() => {
-      sliderWrapper.style.transition = "transform 1s ease-in-out";
-}, 20); }, 3000); 
-}
-setInterval(rotateSlides, 3000);
+document.addEventListener("DOMContentLoaded", () => {
+  const slides = document.querySelectorAll(".sliderItem");
+  let currentSlide = 0;
+  function showSlide(index) {
+    slides.forEach((slide, i) => {
+      slide.querySelector(".sliderImg").classList.toggle("active", i === index);
+    });
+  }
+  function nextSlide() {
+    currentSlide = (currentSlide + 1) % slides.length;
+    showSlide(currentSlide);
+    document.querySelector(".sliderWrapper").style.transform = `translateX(-${ currentSlide * 100  }vw)`;
+  }
+  showSlide(currentSlide);
+  setInterval(nextSlide, 2000);
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  const cartMap = new Map();
+  const products = document.querySelectorAll('.products li');
+
+  products.forEach(product => {
+      product.querySelector('.buy-now').addEventListener('click', () => {
+          const itemKey = product.getAttribute('data-key');
+          const itemNew = product.cloneNode(true);
+
+          if (cartMap.has(itemKey)) {
+              const existingItem = cartMap.get(itemKey);
+              existingItem.classList.add('danger');
+              setTimeout(() => {
+                  existingItem.classList.remove('danger');
+              }, 1000);
+          } else {
+              cartMap.set(itemKey, itemNew);
+              document.querySelector('.list-cart').appendChild(itemNew);
+          }
+      });
+  });
+});
